@@ -1,0 +1,42 @@
+#################################################
+# INFRASTRUCTURE YML CONFIGURATION VERSION 3.9  #
+#################################################  
+version: '3.9'
+
+services:
+  
+  #################################################
+  # Redis                                         #
+  #################################################  
+  redis:
+    image: redis:${REDIS_VERSION}
+    container_name: ${REDIS_CONTAINER_NAME}
+    restart: on-failure
+    command: [ "redis-server", "--appendonly", "yes" ]
+    hostname: ${REDIS_HOST_NAME}
+    volumes:
+      - redis:/data
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+  
+  #################################################
+  # Redis UI                                      #
+  #################################################  
+  redis-ui:
+    image: marian/rebrow:${REDIS_UI_VERSION}
+    container_name: ${REDIS_UI_CONTAINER_NAME}
+    restart: on-failure
+    hostname: ${REDIS_UI_HOST_NAME}
+    links:
+      - redis
+    ports:
+      - "${REDIS_UI_PORT}:${REDIS_UI_PORT}"
+                
+networks:
+  redis_network:
+    name: ${NETWORK_NAME}
+    driver: bridge
+
+volumes:
+  redis:
+    external: false
